@@ -1,11 +1,11 @@
 # RENVION SmartLead AI
 
-RENVION SmartLead AI, ziyaretçilerin yapay zekâ ile RENVION prototip hakkında bilgi almasını ve iletişim bilgilerini bırakmasını sağlayan yapay zekâ destekli bir lead toplama sistemidir.
+RENVION SmartLead AI, ziyaretçilerin RENVION prototip hakkında yapay zekâ ile bilgi almasını ve iletişim bilgilerini bırakmasını sağlayan bir lead toplama sistemidir.
 
-Sistem iki temel arayüzden oluşur:
+Sistem iki arayüzden oluşur:
 
-- B2C Karşılama Sayfası: Ziyaretçi yapay zekâ ile sohbet eder ve iletişim bilgilerini bırakır.
-- B2B Yönetim Paneli: İşletme sahibi oluşturulan lead kayıtlarını görüntüler.
+- B2C: Ziyaretçinin yapay zekâ ile sohbet ettiği ve iletişim bilgilerini bıraktığı arayüz.
+- B2B: Oluşturulan lead kayıtlarının görüntülendiği yönetim paneli.
 
 ## Kullanılan Teknolojiler
 
@@ -14,7 +14,6 @@ Sistem iki temel arayüzden oluşur:
 - SQLite
 - Groq API
 - Wix Velo
-- REST API
 - GitHub
 - Render
 
@@ -38,93 +37,41 @@ smartlead_ai/
         ├── __init__.py
         └── ai_service.py
 
-## Sistem Mimarisi
-
-Proje Separation of Concerns prensibine göre yapılandırılmıştır.
-
-- config.py: Uygulama ayarlarını ve ortam değişkenlerini yönetir.
-- database.py: SQLite veritabanı işlemlerini gerçekleştirir.
-- ai_service.py: Yapay zekâ API çağrılarını gerçekleştirir.
-- routes.py: HTTP isteklerini karşılar ve ilgili katmana yönlendirir.
-- __init__.py: Flask uygulamasını oluşturur.
-- run.py: Uygulamayı çalıştırır.
-
-SQL işlemleri yalnızca database.py içerisinde gerçekleştirilir.
-Yapay zekâ API çağrıları yalnızca ai_service.py içerisinde gerçekleştirilir.
-
-## API Uç Noktaları
-
-### GET /
-B2C karşılama sayfasını açar.
-
-### GET /dashboard
-B2B yönetim panelini açar.
-
-### POST /api/sohbet
-Kullanıcının mesajını yapay zekâ servisine gönderir ve yanıtı döndürür.
-
-Örnek istek:
-
-{
-    "mesaj": "RENVION prototip nedir?"
-}
-
-### POST /api/leads
-Yeni bir lead kaydı oluşturur.
-
-Örnek istek:
-
-{
-    "isim": "Mert Test",
-    "telefon": "05550000000",
-    "mesaj": "RENVION prototip hakkında bilgi almak istiyorum."
-}
-
-### GET /api/leads
-Kayıtlı tüm leadleri en yeniden eskiye doğru getirir.
-
-### GET /health
-Backend servisinin çalışıp çalışmadığını kontrol eder.
-
-## Güvenlik
-
-- API anahtarları .env dosyasında tutulur.
-- .env dosyası GitHub'a yüklenmez.
-- SQL sorgularında parametreli sorgular (?) kullanılır.
-- Dış servis çağrılarında try-except hata yönetimi uygulanır.
-- API yanıtlarında JSON hata mesajları kullanılır.
-
 ## Kurulum
 
-Projeyi klonladıktan sonra sanal ortam oluşturulur:
+Sanal ortam oluşturulur:
 
 python -m venv venv
 
-Sanal ortam aktive edilir ve bağımlılıklar yüklenir:
+Sanal ortam aktive edilir:
+
+venv\Scripts\activate
+
+Bağımlılıklar yüklenir:
 
 pip install -r requirements.txt
 
-.env dosyası oluşturularak gerekli ortam değişkenleri eklenir.
-
-Örnek:
+.env dosyasına gerekli API anahtarı eklenir:
 
 GROQ_API_KEY=your_api_key
 SECRET_KEY=your_secret_key
 
-Uygulamayı çalıştırmak için:
+Uygulama çalıştırılır:
 
 python run.py
+
+## Kullanım
+
+B2C arayüzü üzerinden kullanıcı RENVION prototip hakkında yapay zekâya soru sorabilir ve iletişim bilgilerini sisteme kaydedebilir.
+
+B2B yönetim paneli üzerinden kaydedilen lead bilgileri görüntülenebilir.
 
 ## Canlı Sistem
 
 Backend Render üzerinde yayınlanmıştır.
 
-Health kontrolü:
-
-https://smartlead-ai-wcsw.onrender.com/health
-
-Wix arayüzü backend API üzerinden bu servise bağlanmaktadır.
+https://smartlead-ai-wcsw.onrender.com
 
 ## Proje Amacı
 
-Bu proje ile Flask tabanlı bir backend, SQLite veritabanı, yapay zekâ API entegrasyonu ve Wix Velo frontend bağlantısının modüler bir mimari içerisinde birlikte kullanılması amaçlanmıştır.
+RENVION SmartLead AI ile ziyaretçilerin RENVION prototip hakkında bilgi alması, iletişim bilgilerini bırakması ve oluşturulan leadlerin yönetim panelinden görüntülenmesi sağlanmıştır.
