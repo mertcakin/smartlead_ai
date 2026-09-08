@@ -191,6 +191,7 @@
         const yenileButonu = document.getElementById("yenileButonu");
 
 
+        // Lead kayıtlarını API'den almak için bu fonksiyonu oluşturdum.
         async function leadleriGetir() {
 
             icerik.innerHTML = `
@@ -202,11 +203,13 @@
 
             try {
 
+                // Kayıtlı lead bilgilerini API'den aldım.
                 const response = await fetch("/api/leads");
 
                 const data = await response.json();
 
 
+                // API'den hata gelirse kullanıcıya hata mesajı gösterdim.
                 if (!data.basari) {
 
                     icerik.innerHTML = `
@@ -221,10 +224,12 @@
 
                 const leadler = data.leadler;
 
+                // Toplam lead sayısını ekranda gösterdim.
                 leadSayisi.textContent =
                     `${leadler.length} Lead`;
 
 
+                // Kayıt bulunmuyorsa kullanıcıya bilgi verdim.
                 if (leadler.length === 0) {
 
                     icerik.innerHTML = `
@@ -237,6 +242,7 @@
                 }
 
 
+                // Lead kayıtlarının gösterileceği tabloyu oluşturdum.
                 let tablo = `
                     <div class="tablo-container">
 
@@ -258,6 +264,7 @@
                 `;
 
 
+                // Her lead kaydını tabloya ekledim.
                 leadler.forEach(function (lead) {
 
                     tablo += `
@@ -298,11 +305,13 @@
                 `;
 
 
+                // Oluşturduğum tabloyu dashboard üzerinde gösterdim.
                 icerik.innerHTML = tablo;
 
 
             } catch (error) {
 
+                // API bağlantısı başarısız olduğunda kullanıcıya hata mesajı gösterdim.
                 icerik.innerHTML = `
                     <div class="hata">
                         Lead kayıtları alınırken bir bağlantı hatası oluştu.
@@ -314,12 +323,14 @@
         }
 
 
+        // Yenile butonuna basıldığında lead listesini tekrar getirdim.
         yenileButonu.addEventListener(
             "click",
             leadleriGetir
         );
 
 
+        // Sayfa açıldığında lead kayıtlarını otomatik olarak yükledim.
         leadleriGetir();
 
     </script>

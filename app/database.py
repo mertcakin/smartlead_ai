@@ -3,6 +3,7 @@ from flask import g
 from config import Config
 
 
+# Veritabanı bağlantısını oluşturdum ve tekrar kullanılmasını sağladım.
 def get_db():
     if "db" not in g:
         g.db = sqlite3.connect("smartlead.db")
@@ -11,6 +12,7 @@ def get_db():
     return g.db
 
 
+# Lead kayıtlarının tutulacağı tabloyu oluşturdum.
 def init_db(app):
     with app.app_context():
         db = get_db()
@@ -28,9 +30,11 @@ def init_db(app):
         db.commit()
 
 
+# Yeni müşteri bilgilerini veritabanına kaydetmek için bu fonksiyonu oluşturdum.
 def lead_ekle(isim, telefon, mesaj):
     db = get_db()
 
+    # Verileri parametre olarak göndererek SQL sorgusunu daha güvenli hale getirdim.
     db.execute(
         """
         INSERT INTO leads (isim, telefon, mesaj)
@@ -42,6 +46,7 @@ def lead_ekle(isim, telefon, mesaj):
     db.commit()
 
 
+# Kayıtlı lead bilgilerini en yeniden eskiye doğru getirdim.
 def tum_leadler():
     db = get_db()
 

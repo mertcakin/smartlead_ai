@@ -236,10 +236,12 @@
         const durumAlani = document.getElementById("durum");
 
 
+        // Kullanıcının sorusunu AI servisine göndermek için bu işlemi oluşturdum.
         sorButonu.addEventListener("click", async function () {
 
             const mesaj = mesajInput.value.trim();
 
+            // Kullanıcının boş mesaj göndermesini engelledim.
             if (!mesaj) {
                 cevapAlani.textContent = "Lütfen bir mesaj yazın.";
                 return;
@@ -249,6 +251,7 @@
 
             try {
 
+                // Kullanıcı mesajını sohbet API'sine gönderip yanıtı aldım.
                 const response = await fetch("/api/sohbet", {
                     method: "POST",
                     headers: {
@@ -261,6 +264,7 @@
 
                 const data = await response.json();
 
+                // Başarılı yanıtı ekranda gösterdim, hata durumunu kullanıcıya bildirdim.
                 if (data.basari) {
                     cevapAlani.textContent = data.cevap;
                 } else {
@@ -269,6 +273,7 @@
 
             } catch (error) {
 
+                // API bağlantısı başarısız olduğunda kullanıcıya hata mesajı gösterdim.
                 cevapAlani.textContent =
                     "Bir bağlantı hatası oluştu.";
 
@@ -277,12 +282,14 @@
         });
 
 
+        // Kullanıcının iletişim bilgilerini lead olarak kaydetmek için bu işlemi oluşturdum.
         kaydetButonu.addEventListener("click", async function () {
 
             const isim = isimInput.value.trim();
             const telefon = telefonInput.value.trim();
             const mesaj = mesajInput.value.trim();
 
+            // İsim veya telefon bilgisi eksikse kayıt oluşturulmasını engelledim.
             if (!isim || !telefon) {
                 durumAlani.textContent =
                     "Lütfen isim ve telefon bilgilerinizi girin.";
@@ -291,6 +298,7 @@
 
             try {
 
+                // Lead bilgilerini API'ye göndererek veritabanına kaydettim.
                 const response = await fetch("/api/leads", {
                     method: "POST",
                     headers: {
@@ -305,6 +313,7 @@
 
                 const data = await response.json();
 
+                // Kayıt sonucunu kullanıcıya gösterdim.
                 if (data.basari) {
 
                     durumAlani.textContent =
@@ -318,6 +327,7 @@
 
             } catch (error) {
 
+                // Kayıt sırasında bağlantı hatası oluşursa kullanıcıya bildirdim.
                 durumAlani.textContent =
                     "Bir bağlantı hatası oluştu.";
 

@@ -1,10 +1,13 @@
 import os
 from dotenv import load_dotenv
 
+
+# .env dosyasındaki gizli bilgileri uygulamaya yükledim.
 load_dotenv()
 
 
 class Config:
+    # Uygulama için gerekli gizli anahtarı .env dosyasından aldım.
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
     DATABASE_URL = os.environ.get(
@@ -12,9 +15,11 @@ class Config:
         "sqlite:///smartlead.db"
     )
 
+    # Groq API anahtarını güvenli şekilde ortam değişkeninden aldım.
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
     AI_PROVIDER = os.environ.get("AI_PROVIDER", "groq")
 
+    # Yapay zekânın RENVION hakkında kullanacağı doğrulanmış bilgileri tanımladım.
     BUSINESS_CONTEXT = """
 Sen RENVION markasının yapay zekâ destekli müşteri asistanısın.
 
@@ -194,14 +199,17 @@ takip edilebilen akıllı sistemlere dönüştürmektir.
 
 AI ASİSTAN KURALLARI
 
+# Yapay zekânın yalnızca verilen doğrulanmış bilgileri kullanmasını sağladım.
 Yalnızca yukarıda verilen doğrulanmış RENVION bilgilerini kullan.
 
 Verilen bilgilerde olmayan bir ürün, teknik özellik, fiyat, garanti,
 sertifika, performans değeri, entegrasyon veya şirket bilgisi uydurma.
 
+# Ürün adının proje boyunca standart şekilde kullanılmasını sağladım.
 Ürünün adı her zaman "RENVION prototip" olarak ifade edilmelidir.
 "RENVION Retrofit 1" veya "Retrofit 1" ifadelerini kullanma.
 
+# Yapay zekâ yanıtlarının kısa ve anlaşılır olmasını sağladım.
 Cevaplar en fazla 500 karakter olmalıdır.
 
 Kullanıcı bir konuda bilgi istediğinde mümkün olduğunca doğrudan ve
@@ -221,17 +229,20 @@ Böyle bir durumda kullanıcıya bu konuda doğrulanmış bilgi bulunmadığın�
 belirt ve RENVION ile iletişime geçmesini veya iletişim bilgilerini
 bırakmasını öner.
 
+# AI yanıtlarının düz metin olarak verilmesini sağladım.
 Biçimlendirme kullanma.
 Markdown kullanma.
 ** gibi yıldız işaretleri kullanma.
 Cevapları düz metin olarak ver.
 
+# Ürünle ilgilenen kullanıcıları iletişim bilgisi bırakmaya yönlendirdim.
 Kullanıcı ürünle ilgileniyor veya satın alma konusunda bilgi almak
 istiyorsa isim ve telefon bilgilerini bırakmaya yönlendir.
 
 Kibar, profesyonel ve anlaşılır bir Türkçe kullan.
 """
 
+    # Wix'ten gelen isteklere izin verecek kaynakları belirledim.
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
 
 
@@ -243,6 +254,7 @@ class ProductionConfig(Config):
     DEBUG = False
 
 
+# Geliştirme ve canlı ortam için kullanılacak ayarları ayırdım.
 config = {
     "development": DevelopmentConfig,
     "production": ProductionConfig
