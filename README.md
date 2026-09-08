@@ -14,11 +14,13 @@ Sistem iki arayüzden oluşur:
 - SQLite
 - Groq API
 - Wix Velo
+- REST API
 - GitHub
 - Render
 
 ## Proje Yapısı
 
+```text
 smartlead_ai/
 ├── run.py
 ├── config.py
@@ -36,6 +38,7 @@ smartlead_ai/
     └── services/
         ├── __init__.py
         └── ai_service.py
+```
 
 ## Kurulum
 
@@ -62,16 +65,14 @@ python run.py
 
 ## Kullanım
 
-B2C arayüzü üzerinden kullanıcı RENVION prototip hakkında yapay zekâya soru sorabilir ve iletişim bilgilerini sisteme kaydedebilir.
+B2C arayüzü Wix Velo kullanılarak hazırlanmıştır. Kullanıcı RENVION prototip hakkında yapay zekâya soru sorabilir ve iletişim bilgilerini sisteme kaydedebilir.
 
 B2B yönetim paneli üzerinden kaydedilen lead bilgileri görüntülenebilir.
+
+Wix arayüzleri backend API üzerinden Render üzerinde çalışan Python Flask uygulamasına bağlanmaktadır.
 
 ## Canlı Sistem
 
 Backend Render üzerinde yayınlanmıştır.
 
 https://smartlead-ai-wcsw.onrender.com
-
-## Proje Amacı
-
-RENVION SmartLead AI ile ziyaretçilerin RENVION prototip hakkında bilgi alması, iletişim bilgilerini bırakması ve oluşturulan leadlerin yönetim panelinden görüntülenmesi sağlanmıştır.
