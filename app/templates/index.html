@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RENVION - Yapay Zekâ Destekli Asistan</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa, #e8eef3);
+            color: #1f2937;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px 0;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .slogan {
+            margin-top: 8px;
+            color: #6b7280;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .info-card,
+        .chat-card {
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .info-card {
+            background: white;
+            min-height: 450px;
+        }
+
+        .info-card h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .info-card p {
+            line-height: 1.7;
+            color: #4b5563;
+        }
+
+        .chat-card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .chat-card h2 {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: #111827;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .cevap-alani {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            min-height: 70px;
+            line-height: 1.6;
+        }
+
+        .form-baslik {
+            margin-top: 30px;
+        }
+
+        .durum {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .info-card h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <div class="logo">RENVION</div>
+            <div class="slogan">Yenilikçi çözümler için akıllı asistanınız.</div>
+        </header>
+
+        <div class="content">
+
+            <section class="info-card">
+                <h1>RENVION'a Hoş Geldiniz</h1>
+
+                <p>
+                    RENVION hakkında merak ettiğiniz soruları
+                    yapay zekâ destekli asistanımıza sorabilirsiniz.
+                </p>
+
+                <br>
+
+                <p>
+                    İhtiyaçlarınızı anlamanıza ve size uygun
+                    çözümler hakkında bilgi almanıza yardımcı oluyoruz.
+                </p>
+            </section>
+
+
+            <section class="chat-card">
+
+                <h2>RENVION Asistan</h2>
+
+                <label for="mesaj">Mesajınız</label>
+
+                <textarea
+                    id="mesaj"
+                    placeholder="RENVION hakkında ne öğrenmek istiyorsunuz?"
+                ></textarea>
+
+                <button id="sorButonu">Sor</button>
+
+                <div id="cevap" class="cevap-alani">
+                    Burada yapay zekâ yanıtı görünecek.
+                </div>
+
+
+                <h3 class="form-baslik">İletişim Bilgileriniz</h3>
+
+                <label for="isim">İsim</label>
+
+                <input
+                    type="text"
+                    id="isim"
+                    placeholder="Adınız Soyadınız"
+                >
+
+                <label for="telefon">Telefon</label>
+
+                <input
+                    type="tel"
+                    id="telefon"
+                    placeholder="Telefon numaranız"
+                >
+
+                <button id="kaydetButonu">İletişim Bilgilerimi Kaydet</button>
+
+                <div id="durum" class="durum"></div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const mesajInput = document.getElementById("mesaj");
+        const cevapAlani = document.getElementById("cevap");
+        const sorButonu = document.getElementById("sorButonu");
+
+        const isimInput = document.getElementById("isim");
+        const telefonInput = document.getElementById("telefon");
+        const kaydetButonu = document.getElementById("kaydetButonu");
+        const durumAlani = document.getElementById("durum");
+
+
+        sorButonu.addEventListener("click", async function () {
+
+            const mesaj = mesajInput.value.trim();
+
+            if (!mesaj) {
+                cevapAlani.textContent = "Lütfen bir mesaj yazın.";
+                return;
+            }
+
+            cevapAlani.textContent = "Yanıt hazırlanıyor...";
+
+            try {
+
+                const response = await fetch("/api/sohbet", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        mesaj: mesaj
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.basari) {
+                    cevapAlani.textContent = data.cevap;
+                } else {
+                    cevapAlani.textContent = data.hata;
+                }
+
+            } catch (error) {
+
+                cevapAlani.textContent =
+                    "Bir bağlantı hatası oluştu.";
+
+            }
+
+        });
+
+
+        kaydetButonu.addEventListener("click", async function () {
+
+            const isim = isimInput.value.trim();
+            const telefon = telefonInput.value.trim();
+            const mesaj = mesajInput.value.trim();
+
+            if (!isim || !telefon) {
+                durumAlani.textContent =
+                    "Lütfen isim ve telefon bilgilerinizi girin.";
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/api/leads", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        isim: isim,
+                        telefon: telefon,
+                        mesaj: mesaj
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.basari) {
+
+                    durumAlani.textContent =
+                        "İletişim bilgileriniz başarıyla kaydedildi.";
+
+                } else {
+
+                    durumAlani.textContent = data.hata;
+
+                }
+
+            } catch (error) {
+
+                durumAlani.textContent =
+                    "Bir bağlantı hatası oluştu.";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

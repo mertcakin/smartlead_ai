@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RENVION - Lead Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f3f6f9;
+            color: #1f2937;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px 0;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .baslik {
+            margin-top: 8px;
+            color: #6b7280;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        .dashboard-baslik {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-baslik h1 {
+            font-size: 24px;
+        }
+
+        .lead-sayisi {
+            background: #111827;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .tablo-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: bold;
+        }
+
+        td {
+            color: #4b5563;
+        }
+
+        .bos-mesaj {
+            padding: 30px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .hata {
+            color: #b91c1c;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .yenile {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #111827;
+            color: white;
+            cursor: pointer;
+        }
+
+        .yenile:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+
+            .dashboard-baslik {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <div class="logo">
+                RENVION
+            </div>
+
+            <div class="baslik">
+                Lead Yönetim Paneli
+            </div>
+        </header>
+
+
+        <div class="dashboard-card">
+
+            <div class="dashboard-baslik">
+
+                <h1>
+                    İletişim Talepleri
+                </h1>
+
+                <div>
+                    <span id="leadSayisi" class="lead-sayisi">
+                        0 Lead
+                    </span>
+
+                    <button id="yenileButonu" class="yenile">
+                        Yenile
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div id="icerik">
+
+                <div class="bos-mesaj">
+                    Lead kayıtları yükleniyor...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const icerik = document.getElementById("icerik");
+        const leadSayisi = document.getElementById("leadSayisi");
+        const yenileButonu = document.getElementById("yenileButonu");
+
+
+        async function leadleriGetir() {
+
+            icerik.innerHTML = `
+                <div class="bos-mesaj">
+                    Lead kayıtları yükleniyor...
+                </div>
+            `;
+
+
+            try {
+
+                const response = await fetch("/api/leads");
+
+                const data = await response.json();
+
+
+                if (!data.basari) {
+
+                    icerik.innerHTML = `
+                        <div class="hata">
+                            ${data.hata}
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+                const leadler = data.leadler;
+
+                leadSayisi.textContent =
+                    `${leadler.length} Lead`;
+
+
+                if (leadler.length === 0) {
+
+                    icerik.innerHTML = `
+                        <div class="bos-mesaj">
+                            Henüz kayıtlı bir lead bulunmuyor.
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+                let tablo = `
+                    <div class="tablo-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>ID</th>
+                                    <th>İsim</th>
+                                    <th>Telefon</th>
+                                    <th>Mesaj</th>
+                                    <th>Tarih</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+                `;
+
+
+                leadler.forEach(function (lead) {
+
+                    tablo += `
+                        <tr>
+
+                            <td>
+                                ${lead.id}
+                            </td>
+
+                            <td>
+                                ${lead.isim}
+                            </td>
+
+                            <td>
+                                ${lead.telefon}
+                            </td>
+
+                            <td>
+                                ${lead.mesaj || "-"}
+                            </td>
+
+                            <td>
+                                ${lead.tarih}
+                            </td>
+
+                        </tr>
+                    `;
+
+                });
+
+
+                tablo += `
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                `;
+
+
+                icerik.innerHTML = tablo;
+
+
+            } catch (error) {
+
+                icerik.innerHTML = `
+                    <div class="hata">
+                        Lead kayıtları alınırken bir bağlantı hatası oluştu.
+                    </div>
+                `;
+
+            }
+
+        }
+
+
+        yenileButonu.addEventListener(
+            "click",
+            leadleriGetir
+        );
+
+
+        leadleriGetir();
+
+    </script>
+
+</body>
+</html>
