@@ -16,7 +16,20 @@ def create_app():
     # Wix üzerinden gelen API isteklerine izin verecek CORS ayarını yaptım.
     CORS(
         app,
-        origins=Config.CORS_ORIGINS
+        resources={
+            r"/api/*": {
+                "origins": "*",
+                "allow_headers": [
+                    "Content-Type",
+                    "Authorization"
+                ],
+                "methods": [
+                    "GET",
+                    "POST",
+                    "OPTIONS"
+                ]
+            }
+        }
     )
 
     # Uygulama başlarken veritabanını hazırladım.
