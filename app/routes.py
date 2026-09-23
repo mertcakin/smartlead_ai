@@ -2,7 +2,12 @@ from flask import Blueprint, render_template, request, jsonify
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 from config import Config
-from .database import lead_ekle, tum_leadler, login_kaydi_ekle
+from .database import (
+    lead_ekle,
+    tum_leadler,
+    login_kaydi_ekle,
+    tum_login_kayitlari
+)
 from .services.ai_service import ai_service, AIServiceError
 
 
@@ -197,4 +202,36 @@ def leadleri_getir():
     return jsonify({
         "basari": True,
         "leadler": lead_listesi
+    }), 200
+
+
+@api_bp.route("/login-logs", methods=["GET"])
+def login_loglari_getir():
+    # Yönetim panelinden gelen token bilgisini kontrol ettim.
+    kullanici_adi = token_kontrolu()
+
+    # Geçerli token yoksa giriş kayıtlarına erişimi engelledim.
+    if not kullanici_adi:
+        return jsonify({
+            "basari": False,
+            "hata": "Yetkisiz erişim."
+        }), 401
+
+    # Veritabanındaki giriş kayıtlarını aldım.
+    kayitlar = tum_login_kayitlari()
+
+    login_listesi = []
+
+    # Veritabanı kayıtlarını API formatına dönüştürdüm.
+    for kayit in kayitlar:
+        login_listesi.append({
+            "id": kayit["id"],
+            "kullanici_adi": kayit["kullanici_adi"],
+            "durum": kayit["durum"],
+            "tarih": kayit["tarih"]
+        })
+
+    return jsonify({
+        "basari": True,
+        "loginler": login_listesi
     }), 200
