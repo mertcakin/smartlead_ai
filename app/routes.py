@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
+from config import Config
 from .database import lead_ekle, tum_leadler
 from .services.ai_service import ai_service, AIServiceError
 
@@ -11,6 +13,10 @@ main_bp = Blueprint("main", __name__)
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
+# Yönetim paneli girişinde kullanılacak güvenli token yapısını oluşturdum.
+token_serializer = URLSafeTimedSerializer(Config.SECRET_KEY)
+
+
 @main_bp.route("/")
 def index():
     return render_template("index.html")
@@ -19,6 +25,51 @@ def index():
 @main_bp.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
+
+
+@api_bp.route("/login", methods=["POST"])
+def login():
+    # Wix'ten gelen kullanıcı adı ve şifre bilgilerini aldım.
+    data = request.get_json()
+
+    # Veri gönderilmemişse hata döndürdüm.
+    if not data:
+        return jsonify({
+            "basari": False,
+            "hata": "Giriş bilgileri gönderilmedi."
+        }), 400
+
+    kullanici_adi = data.get("kullanici_adi", "").strip().lower()
+    sifre = data.get("sifre", "")
+
+    # Kullanıcı adı veya şifre boşsa giriş işlemini durdurdum.
+    if not kullanici_adi or not sifre:
+        return jsonify({
+            "basari": False,
+            "hata": "Kullanıcı adı ve şifre zorunludur."
+        }), 400
+
+    # Render Environment Variables üzerinden kullanıcıyı kontrol ettim.
+    dogru_sifre = Config.OGRETMENLER.get(kullanici_adi)
+
+    if dogru_sifre and dogru_sifre == sifre:
+
+        # Başarılı giriş için güvenli erişim token'ı oluşturdum.
+        token = token_serializer.dumps({
+            "kullanici_adi": kullanici_adi
+        })
+
+        return jsonify({
+            "basari": True,
+            "mesaj": "Giriş başarılı.",
+            "token": token
+        }), 200
+
+    # Kullanıcı adı veya şifre yanlışsa girişe izin vermedim.
+    return jsonify({
+        "basari": False,
+        "hata": "Kullanıcı adı veya şifre hatalı."
+    }), 401
 
 
 @api_bp.route("/sohbet", methods=["POST"])

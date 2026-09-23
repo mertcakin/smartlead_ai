@@ -1,4 +1,5 @@
 import os
+import json
 from dotenv import load_dotenv
 
 
@@ -18,6 +19,11 @@ class Config:
     # Groq API anahtarını güvenli şekilde ortam değişkeninden aldım.
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
     AI_PROVIDER = os.environ.get("AI_PROVIDER", "groq")
+
+    # Render Environment Variables üzerinden yönetim kullanıcılarını aldım.
+    OGRETMENLER = json.loads(
+        os.environ.get("OGRETMENLER", "{}")
+    )
 
     # Yapay zekânın RENVION hakkında kullanacağı doğrulanmış bilgileri tanımladım.
     BUSINESS_CONTEXT = """
