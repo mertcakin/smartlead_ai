@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 from config import Config
-from .database import lead_ekle, tum_leadler
+from .database import lead_ekle, tum_leadler, login_kaydi_ekle
 from .services.ai_service import ai_service, AIServiceError
 
 
@@ -15,6 +15,32 @@ api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 # Yönetim paneli girişinde kullanılacak güvenli token yapısını oluşturdum.
 token_serializer = URLSafeTimedSerializer(Config.SECRET_KEY)
+
+
+def token_kontrolu():
+    # İstek içerisindeki Authorization bilgisini aldım.
+    auth_header = request.headers.get("Authorization", "")
+
+    # Authorization bilgisi Bearer token formatında değilse erişimi reddettim.
+    if not auth_header.startswith("Bearer "):
+        return None
+
+    token = auth_header.replace("Bearer ", "", 1).strip()
+
+    if not token:
+        return None
+
+    try:
+        # Token içerisindeki kullanıcı bilgisini doğruladım.
+        veri = token_serializer.loads(
+            token,
+            max_age=3600
+        )
+
+        return veri.get("kullanici_adi")
+
+    except (BadSignature, SignatureExpired):
+        return None
 
 
 @main_bp.route("/")
@@ -54,6 +80,9 @@ def login():
 
     if dogru_sifre and dogru_sifre == sifre:
 
+        # Başarılı girişi veritabanına kaydettim.
+        login_kaydi_ekle(kullanici_adi, "basarili")
+
         # Başarılı giriş için güvenli erişim token'ı oluşturdum.
         token = token_serializer.dumps({
             "kullanici_adi": kullanici_adi
@@ -65,7 +94,9 @@ def login():
             "token": token
         }), 200
 
-    # Kullanıcı adı veya şifre yanlışsa girişe izin vermedim.
+    # Başarısız girişi veritabanına kaydettim.
+    login_kaydi_ekle(kullanici_adi, "basarisiz")
+
     return jsonify({
         "basari": False,
         "hata": "Kullanıcı adı veya şifre hatalı."
@@ -138,6 +169,16 @@ def lead_olustur():
 
 @api_bp.route("/leads", methods=["GET"])
 def leadleri_getir():
+    # Yönetim panelinden gelen token bilgisini kontrol ettim.
+    kullanici_adi = token_kontrolu()
+
+    # Geçerli token yoksa lead bilgilerine erişimi engelledim.
+    if not kullanici_adi:
+        return jsonify({
+            "basari": False,
+            "hata": "Yetkisiz erişim."
+        }), 401
+
     # Veritabanındaki tüm lead kayıtlarını aldım.
     leads = tum_leadler()
 

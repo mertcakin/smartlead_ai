@@ -12,17 +12,28 @@ def get_db():
     return g.db
 
 
-# Lead kayıtlarının tutulacağı tabloyu oluşturdum.
+# Lead ve giriş kayıtlarının tutulacağı tabloları oluşturdum.
 def init_db(app):
     with app.app_context():
         db = get_db()
 
+        # Lead kayıtlarının tutulacağı tabloyu oluşturdum.
         db.execute("""
             CREATE TABLE IF NOT EXISTS leads (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 isim TEXT NOT NULL,
                 telefon TEXT NOT NULL,
                 mesaj TEXT,
+                tarih TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Yönetim paneli girişlerinin tutulacağı tabloyu oluşturdum.
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS login_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kullanici_adi TEXT NOT NULL,
+                durum TEXT NOT NULL,
                 tarih TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -54,6 +65,37 @@ def tum_leadler():
         """
         SELECT id, isim, telefon, mesaj, tarih
         FROM leads
+        ORDER BY tarih DESC
+        """
+    ).fetchall()
+
+    return rows
+
+
+# Yönetim paneli girişini kayıt altına almak için bu fonksiyonu oluşturdum.
+def login_kaydi_ekle(kullanici_adi, durum):
+    db = get_db()
+
+    # Kullanıcı adı ve giriş durumunu veritabanına kaydettim.
+    db.execute(
+        """
+        INSERT INTO login_logs (kullanici_adi, durum)
+        VALUES (?, ?)
+        """,
+        (kullanici_adi, durum)
+    )
+
+    db.commit()
+
+
+# Yönetim paneli giriş kayıtlarını en yeniden eskiye doğru getirdim.
+def tum_login_kayitlari():
+    db = get_db()
+
+    rows = db.execute(
+        """
+        SELECT id, kullanici_adi, durum, tarih
+        FROM login_logs
         ORDER BY tarih DESC
         """
     ).fetchall()
