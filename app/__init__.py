@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, make_response
 from flask_cors import CORS
 
 from config import Config
@@ -12,18 +12,36 @@ def create_app():
 
     app.config.from_object(Config)
 
-    # Wix -> Render API erişimi
     CORS(
         app,
         resources={
             r"/api/*": {
                 "origins": "*",
-                "methods": ["GET", "POST", "OPTIONS"],
-                "allow_headers": ["Content-Type", "Authorization"]
+                "allow_headers": [
+                    "Content-Type",
+                    "Authorization"
+                ],
+                "methods": [
+                    "GET",
+                    "POST",
+                    "OPTIONS"
+                ]
             }
-        },
-        supports_credentials=False
+        }
     )
+
+    # Wix'in gönderdiği OPTIONS (preflight) isteklerini karşıla
+    @app.before_request
+    def handle_preflight():
+        from flask import request
+
+        if request.method == "OPTIONS":
+            response = make_response()
+            response.status_code = 204
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            return response
 
     init_db(app)
 
